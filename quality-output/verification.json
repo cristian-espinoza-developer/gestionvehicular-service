@@ -1,0 +1,97 @@
+{
+  "proyecto": "gestionvehicular-service",
+  "version": "0.0.1-SNAPSHOT",
+  "fecha": "2026-07-05",
+  "commit": "ed4d228",
+  "tests": {
+    "comando": "./gradlew clean test jacocoTestReport",
+    "passed": 38,
+    "total": 38,
+    "coverage": 94.9,
+    "coverage_fuente": "build/reports/jacoco/test/jacocoTestReport.xml (counter type=INSTRUCTION, missed=50 covered=931 a nivel de report agregado; 931/981=94.9%)"
+  },
+  "security": {
+    "fuente": "Semgrep MCP no disponible en esta sesion (no se expuso semgrep_scan/security_check); se realizo revision manual (grep) de secretos y de anotaciones de seguridad sobre src/main/java y src/main/resources",
+    "critical": 0,
+    "high": 1,
+    "secrets": 0,
+    "hallazgos": [
+      {
+        "severidad": "high",
+        "descripcion": "Todos los endpoints de TurnosController (GET /vehiculos/{id}/franjas-disponibles, POST /turnos, GET /turnos/{id}) carecen de autenticacion real: no hay Spring Security, @PreAuthorize ni SecurityConfig en el proyecto (confirmado: build.gradle no declara ninguna dependencia de spring-security). La identidad del policia se toma de un header X-Policia-Id no verificado criptograficamente, por lo que cualquier cliente puede suplantar a cualquier policia con solo cambiar el header.",
+        "archivo": "src/main/java/ec/edu/ups/gestionvehicular/turnos/adapters/in/web/TurnosController.java:20-53",
+        "nota": "Esto es una decision de alcance explicitamente documentada en spec.md (Assumptions: 'mecanismo minimo de identidad... X-Policia-Id... a reemplazar cuando exista un modulo de autenticacion/autorizacion completo'), por lo que no se marca como critical, pero queda como high a triagear antes de exponer el servicio fuera de una red de confianza."
+      }
+    ],
+    "limitaciones": "No se pudo invocar el subagente security-reviewer ni el Semgrep MCP en esta sesion (herramientas no disponibles); no se escaneo con Semgrep real. Se recomienda repetir el analisis con Semgrep antes de considerar el pilar de seguridad completamente verificado."
+  },
+  "spec": "specs/001-agendar-turno-mantenimiento/spec.md",
+  "criteria": [
+    {
+      "id": "FR-001",
+      "fuente": "spec.md · FR-001",
+      "status": "cumple",
+      "evidencia": "ConsultarFranjasDisponiblesServiceTest.debe_listar_las_franjas_disponibles_del_vehiculo_asignado (src/test/.../application/ConsultarFranjasDisponiblesServiceTest.java) y TurnosControllerHappyPathIT.debe_listar_franjas_disponibles (src/test/.../adapters/in/web/TurnosControllerHappyPathIT.java) PASAN; tambien cubierto por el escenario BDD 'Agendar un turno en una franja disponible' (agendar_turno_mantenimiento.feature)."
+    },
+    {
+      "id": "FR-002",
+      "fuente": "spec.md · FR-002",
+      "status": "cumple",
+      "evidencia": "AgendarTurnoServiceTest.debe_agendar_un_turno_cuando_la_franja_esta_disponible y TurnosControllerHappyPathIT.debe_agendar_un_turno_y_devolver_201 PASAN."
+    },
+    {
+      "id": "FR-003",
+      "fuente": "spec.md · FR-003",
+      "status": "cumple",
+      "evidencia": "AgendarTurnoServiceTest.debe_agendar_un_turno_cuando_la_franja_esta_disponible verifica estado AGENDADO, vehiculoId, policiaId y franjaId del turno creado; TurnoTest (src/test/.../domain/TurnoTest.java) verifica el modelo de dominio. Ambos PASAN."
+    },
+    {
+      "id": "FR-004",
+      "fuente": "spec.md · FR-004",
+      "status": "cumple",
+      "evidencia": "AgendarTurnoServiceTest.debe_agendar_un_turno_cuando_la_franja_esta_disponible verifica invocacion a notificadorTurnoPort.notificar(); NotificadorTurnoAdapterTest.debe_marcar_ambas_notificaciones_como_enviadas_cuando_no_hay_fallos verifica notificacion a MECANICO y ENCARGADO; el paso BDD entonces_mecanico_y_encargado_reciben_notificacion (AgendarTurnoStepDefinitions.java) verifica 2 notificaciones (MECANICO y ENCARGADO) end-to-end. Todos PASAN."
+    },
+    {
+      "id": "FR-005",
+      "fuente": "spec.md · FR-005",
+      "status": "cumple",
+      "evidencia": "PersistenceAdaptersIT.debe_reservar_una_franja_disponible_una_sola_vez (src/test/.../adapters/out/persistence/PersistenceAdaptersIT.java) demuestra que una segunda reserva sobre la misma franja falla, respaldado por un UPDATE atomico con clausula WHERE estado=DISPONIBLE en FranjaMantenimientoJpaRepository.reservar (src/main/.../FranjaMantenimientoJpaRepository.java:20-24), que impide la doble reserva a nivel de base de datos. NOTA: la prueba es secuencial (no lanza hilos concurrentes reales); no existe una prueba con concurrencia real (ExecutorService/hilos) que ejercite dos solicitudes simultaneas sobre la misma franja, aunque el mecanismo de UPDATE condicional es correcto para ese escenario."
+    },
+    {
+      "id": "FR-006",
+      "fuente": "spec.md · FR-006",
+      "status": "cumple",
+      "evidencia": "AgendarTurnoServiceConflictTest.cuando_la_franja_ya_fue_reservada_debe_lanzar_excepcion_con_proximas_franjas_disponibles y TurnosControllerConflictIT.debe_devolver_409_con_proximas_franjas_disponibles_cuando_la_franja_ya_fue_reservada PASAN; tambien cubierto por el escenario BDD 'Orientacion ante una franja ya ocupada' (entonces_el_sistema_rechaza_y_muestra_alternativas)."
+    },
+    {
+      "id": "FR-007",
+      "fuente": "spec.md · FR-007",
+      "status": "cumple",
+      "evidencia": "AgendarTurnoServiceTest.debe_rechazar_si_el_vehiculo_no_esta_asignado_al_policia (lanza VehiculoSinAsignacionException) y TurnosControllerHappyPathIT.debe_devolver_403_si_el_vehiculo_no_esta_asignado_al_policia PASAN."
+    },
+    {
+      "id": "FR-008",
+      "fuente": "spec.md · FR-008",
+      "status": "cumple",
+      "evidencia": "FranjaMantenimientoTest.una_franja_disponible_con_inicio_pasado_no_esta_disponible (src/test/.../domain/FranjaMantenimientoTest.java) verifica que una franja con inicio pasado no se considera disponible; la consulta JPA buscarDisponibles filtra 'fechaHoraInicio > :ahora' (FranjaMantenimientoJpaRepository.java:15-18)."
+    },
+    {
+      "id": "FR-009",
+      "fuente": "spec.md · FR-009",
+      "status": "cumple",
+      "evidencia": "AgendarTurnoServiceTest.debe_rechazar_si_ya_existe_un_turno_vigente_para_el_vehiculo (lanza TurnoVigenteExistenteException) y TurnosControllerHappyPathIT.debe_devolver_422_si_ya_existe_turno_vigente PASAN."
+    },
+    {
+      "id": "FR-010",
+      "fuente": "spec.md · FR-010",
+      "status": "cumple",
+      "evidencia": "AgendarTurnoServiceTest.debe_rechazar_si_el_vehiculo_no_esta_asignado_al_policia y ConsultarFranjasDisponiblesServiceTest.debe_rechazar_si_el_vehiculo_no_esta_asignado_al_policia verifican que se valida vehiculoAsignadoPort.buscarPorVehiculoYPolicia(vehiculoId, policiaId) antes de consultar franjas o confirmar turno; el header X-Policia-Id se recibe en TurnosController via TurnosApi (contratos OpenAPI). NOTA de seguridad: el mecanismo de identidad no esta autenticado criptograficamente (ver hallazgo 'high' en security.hallazgos), pero esto es una limitacion de alcance explicitamente asumida en spec.md."
+    },
+    {
+      "id": "EDGE-sin-franjas-disponibles",
+      "fuente": "spec.md · Edge Cases (\"¿Que ocurre si no existe ninguna franja disponible...?\")",
+      "status": "incumple",
+      "evidencia": "El edge case exige que el sistema 'informe claramente que no hay franjas disponibles en el rango consultado, sin presentar una lista vacia sin explicacion'. La implementacion real (TurnosController.listarFranjasDisponibles) y el contrato OpenAPI (FranjasDisponiblesResponse, openapi.yaml:38-43) solo devuelven 200 con 'franjas: []' sin ningun campo de mensaje/explicacion. La prueba TurnosControllerHappyPathIT.debe_devolver_200_con_lista_vacia_cuando_no_hay_franjas_disponibles confirma este comportamiento (lista vacia sin mensaje), que es exactamente lo que el edge case prohibe. Falta implementar un mensaje explicativo (o campo dedicado) cuando la lista de franjas disponibles esta vacia."
+    }
+  ]
+}
