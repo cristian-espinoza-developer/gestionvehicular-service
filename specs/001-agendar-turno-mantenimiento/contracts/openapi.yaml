@@ -1,0 +1,182 @@
+openapi: 3.0.3
+info:
+  title: Gestión Vehicular - Turnos de Mantenimiento
+  description: >
+    Contrato API-First para US-02 (Autoagendar turno de mantenimiento).
+    Fuente de verdad para la generación de interfaces de servidor y DTOs
+    vía openapi-generator.
+  version: 1.0.0
+servers:
+  - url: /api/v1
+tags:
+  - name: turnos
+    description: Agendamiento de turnos de mantenimiento por el policía
+paths:
+  /vehiculos/{vehiculoId}/franjas-disponibles:
+    get:
+      operationId: listarFranjasDisponibles
+      tags: [turnos]
+      summary: Consultar franjas de mantenimiento disponibles para un vehículo
+      parameters:
+        - name: vehiculoId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Franjas disponibles encontradas (puede ser una lista vacía)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FranjasDisponiblesResponse'
+        '404':
+          description: Vehículo no encontrado o sin asignación vigente para el policía autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /turnos:
+    post:
+      operationId: agendarTurno
+      tags: [turnos]
+      summary: Confirmar un turno de mantenimiento sobre una franja disponible
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgendarTurnoRequest'
+      responses:
+        '201':
+          description: Turno registrado; mecánico y encargado notificados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TurnoResponse'
+        '404':
+          description: Vehículo sin asignación vigente para el policía autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: >
+            La franja seleccionada ya fue reservada por otro turno. El cuerpo
+            de la respuesta incluye las próximas franjas disponibles en lugar
+            de un simple mensaje de bloqueo (FR-006).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FranjaOcupadaResponse'
+        '422':
+          description: >
+            El vehículo ya tiene un turno vigente (estado AGENDADO) pendiente
+            de completar (FR-009).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /turnos/{turnoId}:
+    get:
+      operationId: consultarTurno
+      tags: [turnos]
+      summary: Consultar el detalle de un turno agendado
+      parameters:
+        - name: turnoId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Turno encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TurnoResponse'
+        '404':
+          description: Turno no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    FranjaDisponible:
+      type: object
+      required: [id, fechaHoraInicio, fechaHoraFin]
+      properties:
+        id:
+          type: string
+          format: uuid
+        fechaHoraInicio:
+          type: string
+          format: date-time
+        fechaHoraFin:
+          type: string
+          format: date-time
+
+    FranjasDisponiblesResponse:
+      type: object
+      required: [franjas]
+      properties:
+        franjas:
+          type: array
+          items:
+            $ref: '#/components/schemas/FranjaDisponible'
+
+    AgendarTurnoRequest:
+      type: object
+      required: [vehiculoId, franjaId]
+      properties:
+        vehiculoId:
+          type: string
+          format: uuid
+        franjaId:
+          type: string
+          format: uuid
+
+    TurnoResponse:
+      type: object
+      required: [id, vehiculoId, franjaId, estado, fechaCreacion]
+      properties:
+        id:
+          type: string
+          format: uuid
+        vehiculoId:
+          type: string
+          format: uuid
+        franjaId:
+          type: string
+          format: uuid
+        estado:
+          type: string
+          enum: [AGENDADO, COMPLETADO]
+        fechaCreacion:
+          type: string
+          format: date-time
+
+    FranjaOcupadaResponse:
+      type: object
+      required: [mensaje, proximasFranjasDisponibles]
+      properties:
+        mensaje:
+          type: string
+          example: "La franja seleccionada ya no está disponible."
+        proximasFranjasDisponibles:
+          type: array
+          items:
+            $ref: '#/components/schemas/FranjaDisponible'
+
+    ErrorResponse:
+      type: object
+      required: [mensaje]
+      properties:
+        mensaje:
+          type: string
