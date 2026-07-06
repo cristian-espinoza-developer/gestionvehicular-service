@@ -38,10 +38,10 @@ Proyecto único (Gradle) — ver `plan.md` § Project Structure:
 
 **Purpose**: Preparar el build para Arquitectura Limpia, API-First y cobertura JaCoCo
 
-- [ ] T001 Añadir el plugin `jacoco` a `build.gradle` con una tarea `jacocoTestCoverageVerification` (umbral >80% por clase, ≥80% global) enlazada a `check`, excluyendo explícitamente `GestionvehicularServiceApplication` y clases de configuración puramente declarativas (Principio V de la constitución)
-- [ ] T002 [P] Añadir y configurar `org.openapi.generator` en `build.gradle` para generar interfaces de servidor (`interfaceOnly`, generador `spring`) y DTOs a partir de `specs/001-agendar-turno-mantenimiento/contracts/openapi.yaml`, enlazado a la tarea `compileJava`
-- [ ] T003 [P] Añadir dependencias de test `io.cucumber:cucumber-junit-platform-engine`, `io.cucumber:cucumber-spring` y `org.junit.platform:junit-platform-suite` a `build.gradle`
-- [ ] T004 [P] Crear el esqueleto de paquetes del módulo `turnos` bajo `src/main/java/ec/edu/ups/gestionvehicular/turnos/` (`domain/model`, `domain/exception`, `application/port/in`, `application/port/out`, `application/service`, `adapters/in/web`, `adapters/out/persistence`, `adapters/out/notification`)
+- [X] T001 Añadir el plugin `jacoco` a `build.gradle` con una tarea `jacocoTestCoverageVerification` (umbral >80% por clase, ≥80% global) enlazada a `check`, excluyendo explícitamente `GestionvehicularServiceApplication` y clases de configuración puramente declarativas (Principio V de la constitución)
+- [X] T002 [P] Añadir y configurar `org.openapi.generator` en `build.gradle` para generar interfaces de servidor (`interfaceOnly`, generador `spring`) y DTOs a partir de `specs/001-agendar-turno-mantenimiento/contracts/openapi.yaml`, enlazado a la tarea `compileJava`
+- [X] T003 [P] Añadir dependencias de test `io.cucumber:cucumber-junit-platform-engine`, `io.cucumber:cucumber-spring` y `org.junit.platform:junit-platform-suite` a `build.gradle`
+- [X] T004 [P] Crear el esqueleto de paquetes del módulo `turnos` bajo `src/main/java/ec/edu/ups/gestionvehicular/turnos/` (`domain/model`, `domain/exception`, `application/port/in`, `application/port/out`, `application/service`, `adapters/in/web`, `adapters/out/persistence`, `adapters/out/notification`)
 
 ---
 
@@ -51,18 +51,21 @@ Proyecto único (Gradle) — ver `plan.md` § Project Structure:
 
 **⚠️ CRITICAL**: Ninguna historia de usuario puede implementarse hasta completar esta fase
 
-- [ ] T005 [P] Crear enum `EstadoFranja` (`DISPONIBLE`, `OCUPADA`) en `src/main/java/ec/edu/ups/gestionvehicular/turnos/domain/model/EstadoFranja.java`
-- [ ] T006 [P] Crear enum `EstadoTurno` (`AGENDADO`, `COMPLETADO`) en `src/main/java/ec/edu/ups/gestionvehicular/turnos/domain/model/EstadoTurno.java`
-- [ ] T007 [P] Crear entidad de dominio `FranjaMantenimiento` (id, fechaHoraInicio, fechaHoraFin, estado) en `src/main/java/ec/edu/ups/gestionvehicular/turnos/domain/model/FranjaMantenimiento.java` según `data-model.md`
-- [ ] T008 [P] Crear entidad de dominio `Turno` (id, vehiculoId, policiaId, franjaId, estado, fechaCreacion) en `src/main/java/ec/edu/ups/gestionvehicular/turnos/domain/model/Turno.java` según `data-model.md`
-- [ ] T009 [P] Crear entidad de dominio `VehiculoAsignado` (vehiculoId, policiaId) en `src/main/java/ec/edu/ups/gestionvehicular/turnos/domain/model/VehiculoAsignado.java`
-- [ ] T010 [P] Crear entidad de dominio `Notificacion` (id, turnoId, destinatarioTipo, estadoEnvio, fechaEnvio) en `src/main/java/ec/edu/ups/gestionvehicular/turnos/domain/model/Notificacion.java`
-- [ ] T011 [P] Crear excepciones de dominio `FranjaNoDisponibleException`, `VehiculoSinAsignacionException`, `TurnoVigenteExistenteException` en `src/main/java/ec/edu/ups/gestionvehicular/turnos/domain/exception/`
-- [ ] T012 Definir los puertos de salida `FranjaRepositoryPort`, `TurnoRepositoryPort`, `VehiculoAsignadoPort`, `NotificadorTurnoPort` en `src/main/java/ec/edu/ups/gestionvehicular/turnos/application/port/out/` (depende de T005-T010)
-- [ ] T013 [P] Crear entidades JPA y repositorios Spring Data para `FranjaMantenimiento`, `Turno`, `VehiculoAsignado`, `Notificacion` en `src/main/java/ec/edu/ups/gestionvehicular/turnos/adapters/out/persistence/` (depende de T012)
-- [ ] T014 Implementar los adaptadores de persistencia que mapean entidades JPA↔dominio e implementan `FranjaRepositoryPort`, `TurnoRepositoryPort` y `VehiculoAsignadoPort` en `src/main/java/ec/edu/ups/gestionvehicular/turnos/adapters/out/persistence/` (depende de T013)
-- [ ] T015 [P] Implementar el adaptador `NotificadorTurnoAdapter` que implementa `NotificadorTurnoPort` (persiste `Notificacion` vía repositorio; ver Edge Case de fallo de envío) en `src/main/java/ec/edu/ups/gestionvehicular/turnos/adapters/out/notification/NotificadorTurnoAdapter.java` (depende de T012, T013)
-- [ ] T016 [P] Prueba de integración `@DataJpaTest` de los adaptadores de persistencia (franjas, turnos, vehículo asignado, notificación) en `src/test/java/ec/edu/ups/gestionvehicular/turnos/adapters/out/persistence/PersistenceAdaptersIT.java` (depende de T014)
+- [X] T005 [P] Crear enum `EstadoFranja` (`DISPONIBLE`, `OCUPADA`) en `src/main/java/ec/edu/ups/gestionvehicular/turnos/domain/model/EstadoFranja.java`
+- [X] T006 [P] Crear enum `EstadoTurno` (`AGENDADO`, `COMPLETADO`) en `src/main/java/ec/edu/ups/gestionvehicular/turnos/domain/model/EstadoTurno.java`
+- [X] T007 [P] Crear entidad de dominio `FranjaMantenimiento` (id, fechaHoraInicio, fechaHoraFin, estado) en `src/main/java/ec/edu/ups/gestionvehicular/turnos/domain/model/FranjaMantenimiento.java` según `data-model.md`
+- [X] T008 [P] Crear entidad de dominio `Turno` (id, vehiculoId, policiaId, franjaId, estado, fechaCreacion) en `src/main/java/ec/edu/ups/gestionvehicular/turnos/domain/model/Turno.java` según `data-model.md`
+- [X] T009 [P] Crear entidad de dominio `VehiculoAsignado` (vehiculoId, policiaId) en `src/main/java/ec/edu/ups/gestionvehicular/turnos/domain/model/VehiculoAsignado.java`
+- [X] T010 [P] Crear entidad de dominio `Notificacion` (id, turnoId, destinatarioTipo, estadoEnvio, fechaEnvio) en `src/main/java/ec/edu/ups/gestionvehicular/turnos/domain/model/Notificacion.java`
+- [X] T011 [P] Crear excepciones de dominio `FranjaNoDisponibleException`, `VehiculoSinAsignacionException`, `TurnoVigenteExistenteException` en `src/main/java/ec/edu/ups/gestionvehicular/turnos/domain/exception/`
+- [X] T012 Definir los puertos de salida `FranjaRepositoryPort`, `TurnoRepositoryPort`, `VehiculoAsignadoPort`, `NotificadorTurnoPort` en `src/main/java/ec/edu/ups/gestionvehicular/turnos/application/port/out/` (depende de T005-T010)
+- [X] T013 Resolver el `policiaId` solicitante (FR-010): el contrato `openapi.yaml` ya modela `X-Policia-Id` como encabezado obligatorio en `agendarTurno`/`listarFranjasDisponibles`, y `openapi-generator` lo expone como parámetro `UUID xPoliciaId` tipado en `TurnosApi` — no se requiere un `PoliciaIdentityPort`/adaptador adicional (se descartó por redundante frente al contrato, YAGNI); `TurnosController` pasa `xPoliciaId` directamente a los casos de uso
+- [X] T014 Crear el esquema DDL de `franja_mantenimiento`, `turno` (con restricción `UNIQUE` sobre `franja_id`, FR-005), `vehiculo_asignado` y `notificacion` en `src/main/resources/db/schema.sql`, y configurar `spring.sql.init.mode=always` en `src/main/resources/application.yaml` (depende de T005-T010)
+- [X] T015 Precargar datos de ejemplo (un `vehiculo_asignado` y varias `franja_mantenimiento` en estado `DISPONIBLE` con fechas futuras, suficientes para validar los Escenarios 1 y 2 de `quickstart.md`) en `src/main/resources/db/data.sql` (depende de T014)
+- [X] T016 [P] Crear entidades JPA y repositorios Spring Data para `FranjaMantenimiento`, `Turno`, `VehiculoAsignado`, `Notificacion` en `src/main/java/ec/edu/ups/gestionvehicular/turnos/adapters/out/persistence/` (depende de T012, T014)
+- [X] T017 Implementar los adaptadores de persistencia que mapean entidades JPA↔dominio e implementan `FranjaRepositoryPort`, `TurnoRepositoryPort` y `VehiculoAsignadoPort` en `src/main/java/ec/edu/ups/gestionvehicular/turnos/adapters/out/persistence/` (depende de T016)
+- [X] T018 [P] Implementar el adaptador `NotificadorTurnoAdapter` que implementa `NotificadorTurnoPort` (persiste `Notificacion` vía repositorio; ver Edge Case de fallo de envío) en `src/main/java/ec/edu/ups/gestionvehicular/turnos/adapters/out/notification/NotificadorTurnoAdapter.java` (depende de T012, T016)
+- [X] T019 [P] Prueba de integración `@DataJpaTest` de los adaptadores de persistencia (franjas, turnos, vehículo asignado, notificación) en `src/test/java/ec/edu/ups/gestionvehicular/turnos/adapters/out/persistence/PersistenceAdaptersIT.java` (depende de T015, T017)
 
 **Checkpoint**: Dominio, puertos, persistencia y notificación listos — las historias de usuario pueden comenzar
 
@@ -78,19 +81,19 @@ Proyecto único (Gradle) — ver `plan.md` § Project Structure:
 
 > **NOTE: Escribir estas pruebas PRIMERO y verificar que fallan antes de implementar**
 
-- [ ] T017 [P] [US1] Unit test de `AgendarTurnoService` (camino feliz, dobles de prueba para los port/out) en `src/test/java/ec/edu/ups/gestionvehicular/turnos/application/AgendarTurnoServiceTest.java`
-- [ ] T018 [P] [US1] Unit test de `ConsultarFranjasDisponiblesService` en `src/test/java/ec/edu/ups/gestionvehicular/turnos/application/ConsultarFranjasDisponiblesServiceTest.java`
-- [ ] T019 [P] [US1] Unit test de `ConsultarTurnoService` en `src/test/java/ec/edu/ups/gestionvehicular/turnos/application/ConsultarTurnoServiceTest.java`
-- [ ] T020 [P] [US1] Integration test `@WebMvcTest` del camino feliz de `TurnosController` (consultar franjas, agendar, consultar turno) en `src/test/java/ec/edu/ups/gestionvehicular/turnos/adapters/in/web/TurnosControllerHappyPathIT.java`
-- [ ] T021 [US1] Escenario funcional/BDD (Gherkin, Acceptance Scenario 1 de `spec.md`) y sus step definitions + runner Cucumber en `src/test/resources/features/agendar_turno_mantenimiento.feature` y `src/test/java/ec/edu/ups/gestionvehicular/turnos/bdd/AgendarTurnoRunner.java` / `AgendarTurnoStepDefinitions.java`
+- [X] T020 [P] [US1] Unit test de `AgendarTurnoService` (camino feliz, dobles de prueba para los port/out) en `src/test/java/ec/edu/ups/gestionvehicular/turnos/application/AgendarTurnoServiceTest.java`
+- [X] T021 [P] [US1] Unit test de `ConsultarFranjasDisponiblesService` en `src/test/java/ec/edu/ups/gestionvehicular/turnos/application/ConsultarFranjasDisponiblesServiceTest.java`
+- [X] T022 [P] [US1] Unit test de `ConsultarTurnoService` en `src/test/java/ec/edu/ups/gestionvehicular/turnos/application/ConsultarTurnoServiceTest.java`
+- [X] T023 [P] [US1] Integration test `@WebMvcTest` del camino feliz de `TurnosController` (consultar franjas, agendar, consultar turno) en `src/test/java/ec/edu/ups/gestionvehicular/turnos/adapters/in/web/TurnosControllerHappyPathIT.java`
+- [X] T024 [US1] Escenario funcional/BDD (Gherkin, Acceptance Scenario 1 de `spec.md`) y sus step definitions + runner Cucumber en `src/test/resources/features/agendar_turno_mantenimiento.feature` y `src/test/java/ec/edu/ups/gestionvehicular/turnos/bdd/AgendarTurnoRunner.java` / `AgendarTurnoStepDefinitions.java`
 
 ### Implementation for User Story 1
 
-- [ ] T022 [US1] Definir los puertos de entrada `AgendarTurnoUseCase`, `ConsultarFranjasDisponiblesUseCase`, `ConsultarTurnoUseCase` en `src/main/java/ec/edu/ups/gestionvehicular/turnos/application/port/in/` (depende de T012)
-- [ ] T023 [US1] Implementar `AgendarTurnoService` (camino feliz: valida vehículo asignado, reserva franja de forma atómica, crea turno, dispara notificación) en `src/main/java/ec/edu/ups/gestionvehicular/turnos/application/service/AgendarTurnoService.java` (depende de T022)
-- [ ] T024 [P] [US1] Implementar `ConsultarFranjasDisponiblesService` (solo franjas `DISPONIBLE` con inicio futuro, FR-008) en `src/main/java/ec/edu/ups/gestionvehicular/turnos/application/service/ConsultarFranjasDisponiblesService.java` (depende de T022)
-- [ ] T025 [P] [US1] Implementar `ConsultarTurnoService` en `src/main/java/ec/edu/ups/gestionvehicular/turnos/application/service/ConsultarTurnoService.java` (depende de T022)
-- [ ] T026 [US1] Implementar `TurnosController` (implementa la interfaz de servidor generada por openapi-generator) y los mappers DTO↔dominio para los 3 endpoints en `src/main/java/ec/edu/ups/gestionvehicular/turnos/adapters/in/web/TurnosController.java` (depende de T023, T024, T025)
+- [X] T025 [US1] Definir los puertos de entrada `AgendarTurnoUseCase`, `ConsultarFranjasDisponiblesUseCase`, `ConsultarTurnoUseCase` en `src/main/java/ec/edu/ups/gestionvehicular/turnos/application/port/in/` (depende de T012)
+- [X] T026 [US1] Implementar `AgendarTurnoService` (camino feliz: recibe `policiaId` ya resuelto por el controller desde `X-Policia-Id`, valida vía `VehiculoAsignadoPort` que el vehículo esté asignado a ese policía (FR-010), reserva franja de forma atómica, crea turno, dispara notificación) en `src/main/java/ec/edu/ups/gestionvehicular/turnos/application/service/AgendarTurnoService.java` (depende de T025)
+- [X] T027 [P] [US1] Implementar `ConsultarFranjasDisponiblesService` (solo franjas `DISPONIBLE` con inicio futuro, FR-008; valida propiedad del vehículo vía `VehiculoAsignadoPort` con el `policiaId` recibido, FR-010) en `src/main/java/ec/edu/ups/gestionvehicular/turnos/application/service/ConsultarFranjasDisponiblesService.java` (depende de T025)
+- [X] T028 [P] [US1] Implementar `ConsultarTurnoService` en `src/main/java/ec/edu/ups/gestionvehicular/turnos/application/service/ConsultarTurnoService.java` (depende de T025)
+- [X] T029 [US1] Implementar `TurnosController` (implementa `TurnosApi` generado por openapi-generator, que ya expone `X-Policia-Id` como parámetro `UUID xPoliciaId`; responde `403` si el vehículo no pertenece al policía) y los mappers DTO↔dominio para los 3 endpoints en `src/main/java/ec/edu/ups/gestionvehicular/turnos/adapters/in/web/TurnosController.java` (depende de T026, T027, T028)
 
 **Checkpoint**: User Story 1 funcional y probable de forma independiente (MVP)
 
@@ -104,14 +107,14 @@ Proyecto único (Gradle) — ver `plan.md` § Project Structure:
 
 ### Tests for User Story 2 (BDD, escritas antes de la implementación) ⚠️
 
-- [ ] T027 [P] [US2] Unit test de `AgendarTurnoService`: conflicto de franja ya ocupada devuelve próximas franjas disponibles, en `src/test/java/ec/edu/ups/gestionvehicular/turnos/application/AgendarTurnoServiceConflictTest.java`
-- [ ] T028 [P] [US2] Integration test `@WebMvcTest` del escenario de conflicto (`409`) de `TurnosController` en `src/test/java/ec/edu/ups/gestionvehicular/turnos/adapters/in/web/TurnosControllerConflictIT.java`
-- [ ] T029 [US2] Escenario funcional/BDD (Gherkin, Acceptance Scenario 2 de `spec.md`) añadido a `src/test/resources/features/agendar_turno_mantenimiento.feature` y a los step definitions en `src/test/java/ec/edu/ups/gestionvehicular/turnos/bdd/AgendarTurnoStepDefinitions.java` (depende de T021)
+- [ ] T030 [P] [US2] Unit test de `AgendarTurnoService`: conflicto de franja ya ocupada devuelve próximas franjas disponibles, en `src/test/java/ec/edu/ups/gestionvehicular/turnos/application/AgendarTurnoServiceConflictTest.java`
+- [ ] T031 [P] [US2] Integration test `@WebMvcTest` del escenario de conflicto (`409`) de `TurnosController` en `src/test/java/ec/edu/ups/gestionvehicular/turnos/adapters/in/web/TurnosControllerConflictIT.java`
+- [ ] T032 [US2] Escenario funcional/BDD (Gherkin, Acceptance Scenario 2 de `spec.md`) añadido a `src/test/resources/features/agendar_turno_mantenimiento.feature` y a los step definitions en `src/test/java/ec/edu/ups/gestionvehicular/turnos/bdd/AgendarTurnoStepDefinitions.java` (depende de T024)
 
 ### Implementation for User Story 2
 
-- [ ] T030 [US2] Extender `AgendarTurnoService` para capturar el conflicto de franja ya ocupada (chequeo atómico/optimista sobre la reserva) y calcular las próximas franjas disponibles vía `FranjaRepositoryPort` en `src/main/java/ec/edu/ups/gestionvehicular/turnos/application/service/AgendarTurnoService.java` (depende de T023)
-- [ ] T031 [US2] Añadir un manejador de excepciones que traduzca `FranjaNoDisponibleException` a una respuesta `409` con `proximasFranjasDisponibles` en `src/main/java/ec/edu/ups/gestionvehicular/turnos/adapters/in/web/TurnosExceptionHandler.java` (depende de T026, T030)
+- [ ] T033 [US2] Extender `AgendarTurnoService` para capturar el conflicto de franja ya ocupada mediante la actualización condicional `UPDATE franja_mantenimiento SET estado='OCUPADA' WHERE id=? AND estado='DISPONIBLE'` (si afecta 0 filas, lanzar `FranjaNoDisponibleException`; ver `research.md` §8) y calcular las próximas franjas disponibles vía `FranjaRepositoryPort` en `src/main/java/ec/edu/ups/gestionvehicular/turnos/application/service/AgendarTurnoService.java` (depende de T014, T026)
+- [ ] T034 [US2] Añadir un manejador de excepciones que traduzca `FranjaNoDisponibleException` a una respuesta `409` con `proximasFranjasDisponibles` en `src/main/java/ec/edu/ups/gestionvehicular/turnos/adapters/in/web/TurnosExceptionHandler.java` (depende de T029, T033)
 
 **Checkpoint**: User Story 1 y 2 funcionan de forma independiente y en conjunto
 
@@ -121,12 +124,12 @@ Proyecto único (Gradle) — ver `plan.md` § Project Structure:
 
 **Purpose**: Edge cases de `spec.md`, verificación de cobertura y validación manual
 
-- [ ] T032 [P] Test y guarda de negocio: vehículo sin asignación devuelve `404` (`VehiculoSinAsignacionException`) — unit test en `application/AgendarTurnoServiceTest.java` e integración en `adapters/in/web/TurnosControllerHappyPathIT.java`
-- [ ] T033 [P] Test y guarda de negocio: turno vigente ya existente para el vehículo devuelve `422` (`TurnoVigenteExistenteException`) — unit test en `application/AgendarTurnoServiceTest.java` e integración en `adapters/in/web/`
-- [ ] T034 [P] Test y manejo: sin franjas disponibles en el rango consultado → respuesta con lista vacía y mensaje explicativo (no una lista vacía sin contexto) en `ConsultarFranjasDisponiblesService` y su test
-- [ ] T035 [P] Test y manejo: fallo al notificar no revierte el turno (`Notificacion` queda `PENDIENTE`, `Turno` permanece `AGENDADO`) — unit test de `AgendarTurnoService` y de `NotificadorTurnoAdapter`
-- [ ] T036 Ejecutar `./gradlew check` y revisar `build/reports/jacoco/test/html/index.html`; ajustar pruebas o exclusiones hasta cumplir >80% por clase y ≥80% global (Principio V)
-- [ ] T037 Ejecutar manualmente los pasos de `quickstart.md` contra el servicio levantado con `./gradlew bootRun` para validar ambos escenarios de aceptación end-to-end
+- [ ] T035 [P] Test y guarda de negocio: vehículo sin asignación devuelve `404` (`VehiculoSinAsignacionException`) — unit test en `application/AgendarTurnoServiceTest.java` e integración en `adapters/in/web/TurnosControllerHappyPathIT.java`
+- [ ] T036 [P] Test y guarda de negocio: turno vigente ya existente para el vehículo devuelve `422` (`TurnoVigenteExistenteException`) — unit test en `application/AgendarTurnoServiceTest.java` e integración en `adapters/in/web/`
+- [ ] T037 [P] Test y manejo: sin franjas disponibles en el rango consultado → respuesta con lista vacía y mensaje explicativo (no una lista vacía sin contexto) en `ConsultarFranjasDisponiblesService` y su test
+- [ ] T038 [P] Test y manejo: fallo al notificar no revierte el turno (`Notificacion` queda `PENDIENTE`, `Turno` permanece `AGENDADO`) — unit test de `AgendarTurnoService` y de `NotificadorTurnoAdapter`
+- [ ] T039 Ejecutar `./gradlew check` y revisar `build/reports/jacoco/test/html/index.html`; ajustar pruebas o exclusiones hasta cumplir >80% por clase y ≥80% global (Principio V)
+- [ ] T040 Ejecutar manualmente los pasos de `quickstart.md` contra el servicio levantado con `./gradlew bootRun` para validar ambos escenarios de aceptación end-to-end
 
 ---
 
@@ -137,13 +140,13 @@ Proyecto único (Gradle) — ver `plan.md` § Project Structure:
 - **Setup (Phase 1)**: Sin dependencias — puede iniciar de inmediato
 - **Foundational (Phase 2)**: Depende de Setup — BLOQUEA ambas historias
 - **User Story 1 (Phase 3)**: Depende de Foundational
-- **User Story 2 (Phase 4)**: Depende de Foundational y de la implementación del camino feliz de US1 (T023, T026), porque extiende el mismo `AgendarTurnoService`/`TurnosController`
+- **User Story 2 (Phase 4)**: Depende de Foundational y de la implementación del camino feliz de US1 (T026, T029), porque extiende el mismo `AgendarTurnoService`/`TurnosController`
 - **Polish (Phase 5)**: Depende de que US1 y US2 estén completas
 
 ### User Story Dependencies
 
 - **User Story 1 (P1)**: Sin dependencia de otras historias — es el MVP
-- **User Story 2 (P2)**: Extiende el flujo de confirmación de turno de US1 (mismo servicio/endpoint); no es implementable antes de que exista T023/T026, pero sí es independientemente probable una vez implementada (escenario de conflicto vs. escenario feliz)
+- **User Story 2 (P2)**: Extiende el flujo de confirmación de turno de US1 (mismo servicio/endpoint); no es implementable antes de que exista T026/T029, pero sí es independientemente probable una vez implementada (escenario de conflicto vs. escenario feliz)
 
 ### Within Each User Story
 
@@ -155,10 +158,10 @@ Proyecto único (Gradle) — ver `plan.md` § Project Structure:
 ### Parallel Opportunities
 
 - Todas las tareas [P] de Setup (T002-T004) en paralelo
-- Todas las tareas [P] de Foundational (T005-T011, T013, T015, T016) en paralelo dentro de sus dependencias
-- Dentro de US1: T017-T020 en paralelo (tests, archivos distintos); T024-T025 en paralelo (servicios distintos)
-- Dentro de US2: T027-T028 en paralelo
-- Todas las tareas [P] de Polish (T032-T035) en paralelo
+- Todas las tareas [P] de Foundational (T005-T011, T016, T018, T019) en paralelo dentro de sus dependencias; T014/T015 (schema.sql/data.sql) son secuenciales entre sí
+- Dentro de US1: T020-T023 en paralelo (tests, archivos distintos); T027-T028 en paralelo (servicios distintos)
+- Dentro de US2: T030-T031 en paralelo
+- Todas las tareas [P] de Polish (T035-T038) en paralelo
 
 ---
 

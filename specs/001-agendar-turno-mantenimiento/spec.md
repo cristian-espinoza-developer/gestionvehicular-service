@@ -113,12 +113,18 @@ sin alternativas.
 - **FR-009**: El sistema MUST advertir al policía si ya existe un turno
   vigente (no completado) para su vehículo antes de permitir agendar uno
   adicional.
+- **FR-010**: El sistema MUST identificar al policía solicitante mediante un
+  mecanismo de identidad asociado a cada solicitud (p. ej. encabezado o
+  contexto de sesión), y MUST validar que el `vehiculoId` indicado esté
+  efectivamente asignado a ese policía antes de permitir la consulta de
+  franjas o la confirmación de un turno.
 
 ### Key Entities *(include if feature involves data)*
 
 - **Turno de mantenimiento**: representa una cita agendada; atributos clave:
   vehículo asociado, policía solicitante, franja (fecha/hora), estado
-  (agendado, completado, cancelado), fecha de creación.
+  (agendado, completado — la cancelación queda fuera de alcance de esta
+  historia, ver Assumptions), fecha de creación.
 - **Franja disponible**: representa un bloque de tiempo ofrecido para
   mantenimiento; atributos clave: fecha/hora de inicio y fin, estado
   (disponible/ocupada).
@@ -161,3 +167,7 @@ sin alternativas.
   mecánico y el encargado reciban aviso del nuevo turno.
 - Se asume una única franja por turno (no se agendan múltiples franjas en
   una sola confirmación).
+- Esta historia asume un mecanismo mínimo de identidad del policía
+  solicitante (p. ej. encabezado `X-Policia-Id` validado contra
+  `vehiculo_asignado`), a reemplazar cuando exista un módulo de
+  autenticación/autorización completo (fuera de alcance de esta historia).

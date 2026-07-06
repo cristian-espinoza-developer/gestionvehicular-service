@@ -71,22 +71,37 @@ lógica) vía el bloque de exclusión de JaCoCo.
 ## 5. Persistencia de franjas y turnos
 
 **Decision**: Modelar `FranjaMantenimiento` y `Turno` como entidades JPA
-propias de este módulo (esquema gestionado por el propio proyecto vía
-Hibernate DDL en desarrollo/pruebas), usando H2 como en el resto del
-proyecto. No se integra aún con un sistema externo de programación de
-mecánicos.
+propias de este módulo, usando H2 como en el resto del proyecto. El esquema
+(DDL) se define explícitamente en `src/main/resources/db/schema.sql` y los
+datos precargados (vehículo(s) asignado(s) de ejemplo y un conjunto de
+franjas de mantenimiento futuras) en `src/main/resources/db/data.sql`,
+ambos ejecutados automáticamente por Spring Boot al iniciar (modo
+`spring.sql.init.mode=always`), en vez de dejar el esquema a la generación
+automática de Hibernate (`ddl-auto`). No se integra aún con un sistema
+externo de programación de mecánicos.
 
 **Rationale**: La spec asume que las franjas ya existen (gestionadas fuera
 del alcance de esta historia de UI), pero como este es el primer feature
 del proyecto no existe aún ningún módulo que las persista; crear las
-entidades mínimas necesarias es la única forma de satisfacer los criterios
-de aceptación sin depender de un sistema inexistente. Se documenta como
-supuesto en `spec.md` y `data-model.md`.
+entidades mínimas necesarias y precargar datos de ejemplo es la única forma
+de satisfacer los criterios de aceptación y permitir validar `quickstart.md`
+sin depender de un sistema externo inexistente. Versionar el esquema como
+script SQL explícito (en vez de `ddl-auto: update/create`) hace el esquema
+auditable y reproducible entre entornos, y evita que Hibernate infiera un
+DDL implícito no revisado. Se documenta como supuesto en `spec.md` y
+`data-model.md`.
 
 **Alternatives considered**:
 - Servicio externo de calendario/mecánicos: rechazado por falta de
   información sobre su existencia y por introducir una integración no
   solicitada (viola YAGNI).
+- `spring.jpa.hibernate.ddl-auto=update`/`create` sin scripts SQL versionados:
+  rechazado porque el esquema quedaría implícito en las anotaciones JPA, sin
+  un artefacto auditable ni forma directa de precargar datos de ejemplo.
+- Flyway/Liquibase (migraciones versionadas con historial): considerado para
+  una evolución futura del esquema, pero rechazado por ahora al no existir
+  todavía una segunda migración que gestionar (YAGNI); `schema.sql` +
+  `data.sql` es suficiente para el alcance actual de una sola feature.
 
 ## 6. Asignación de vehículo al policía
 
@@ -105,6 +120,44 @@ cuando el módulo de vehículos se construya.
 - Hardcodear la validación de vehículo en el caso de uso sin puerto:
   rechazado por violar SOLID (inversión de dependencias) y por acoplar el
   caso de uso a JPA.
+
+## 7. Identidad del policía solicitante
+
+**Decision**: Resolver `policiaId` vía un puerto de entrada mínimo
+(`PoliciaIdentityPort`) que lee el encabezado HTTP `X-Policia-Id` de cada
+request, en vez de implementar autenticación real.
+
+**Rationale**: No existe aún módulo de autenticación en el proyecto
+(greenfield); introducirlo ahora sería alcance no solicitado (viola YAGNI,
+Principio III). Un encabezado explícito mantiene el caso de uso
+desacoplado del mecanismo real de identidad (SOLID, inversión de
+dependencias) y es reemplazable sin tocar dominio/aplicación cuando exista
+autenticación real (FR-010).
+
+**Alternatives considered**:
+- Spring Security completo (JWT/sesión): rechazado, fuera de alcance de
+  esta historia.
+- Asumir un único policía fijo de prueba: rechazado, no permite validar el
+  escenario de conflicto de US2 con múltiples usuarios concurrentes.
+
+## 8. Atomicidad en la reserva de una franja
+
+**Decision**: La reserva atómica de una franja se implementa mediante una
+actualización condicional (`UPDATE franja_mantenimiento SET
+estado='OCUPADA' WHERE id=? AND estado='DISPONIBLE'`) combinada con una
+restricción `UNIQUE` sobre `turno.franja_id`, en vez de bloqueo optimista
+vía `@Version` de JPA.
+
+**Rationale**: Es el mecanismo más simple y explícito para garantizar
+FR-005 sin depender de reintentos de `OptimisticLockException`; si la
+actualización condicional afecta 0 filas, se interpreta directamente como
+conflicto de reserva (FR-006).
+
+**Alternatives considered**:
+- `@Version` (bloqueo optimista) + reintento automático: rechazado, más
+  complejo de lo necesario para el volumen de esta feature.
+- `SELECT ... FOR UPDATE` (bloqueo pesimista): rechazado, requiere
+  gestión explícita de transacciones largas sin beneficio adicional aquí.
 
 ## Resumen
 

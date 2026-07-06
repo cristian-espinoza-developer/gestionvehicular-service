@@ -29,7 +29,10 @@ integración.
 **Storage**: Relacional vía Spring Data JPA; H2 para desarrollo/pruebas (ya
 presente en el proyecto). No se define aún un motor productivo distinto;
 se asume H2/JPA como suficiente para esta feature (documentado en
-`research.md`).
+`research.md`). El esquema (DDL) y los datos precargados (franjas de
+mantenimiento y vehículo asignado de ejemplo) se versionan como scripts SQL
+en `src/main/resources/db/` (`schema.sql` + `data.sql`), en vez de dejar el
+esquema a la generación automática de Hibernate.
 
 **Testing**: JUnit 5 + Mockito (unitarias sobre dominio/casos de uso),
 `@DataJpaTest` / `@WebMvcTest` (integración sobre adaptadores JPA y web),
@@ -54,6 +57,13 @@ Limpia, BDD en 3 niveles, SOLID/YAGNI/DRY, API-First con OpenAPI +
 **Scale/Scope**: Escala de una flota institucional (decenas de vehículos,
 pocas decenas de turnos/día); un único endpoint de consulta y uno de
 confirmación de turno para esta historia.
+
+**Identidad del solicitante**: Se introduce un `PoliciaIdentityPort` mínimo
+que resuelve el `policiaId` desde el encabezado HTTP `X-Policia-Id` de cada
+request; el adaptador web valida, antes de despachar al caso de uso, que
+ese `policiaId` corresponda al `vehiculoId` recibido (vía
+`VehiculoAsignadoPort`). No se implementa autenticación real (JWT/sesión)
+en esta historia (FR-010) — ver `research.md` §7.
 
 ## Constitution Check
 
@@ -105,8 +115,11 @@ src/main/java/ec/edu/ups/gestionvehicular/
             └── notification/  # Adaptador que implementa NotificadorTurnoPort
 
 src/main/resources/
-└── openapi/
-    └── (contrato copiado/consumido por el plugin openapi-generator en build time)
+├── openapi/
+│   └── (contrato copiado/consumido por el plugin openapi-generator en build time)
+└── db/
+    ├── schema.sql          # DDL de franja_mantenimiento, turno, vehiculo_asignado, notificacion
+    └── data.sql            # Datos precargados: vehículo(s) asignado(s) y franjas de mantenimiento de ejemplo
 
 src/test/java/ec/edu/ups/gestionvehicular/turnos/
 ├── domain/                    # unit tests de entidades y reglas de negocio

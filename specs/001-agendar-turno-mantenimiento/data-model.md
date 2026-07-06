@@ -19,6 +19,11 @@ módulo al ser el primer feature del proyecto.
 - Una franja `OCUPADA` no puede volver a reservarse (FR-005).
 - Solo franjas `DISPONIBLE` con `fechaHoraInicio` futura se listan como
   disponibles (FR-001, FR-008).
+- La transición `DISPONIBLE → OCUPADA` se ejecuta como un
+  `UPDATE ... WHERE id = ? AND estado = 'DISPONIBLE'`; si la actualización
+  afecta 0 filas, se interpreta como conflicto de reserva (lanza
+  `FranjaNoDisponibleException`). Esto hace atómica la operación sin
+  necesitar una transacción `SERIALIZABLE` (ver `research.md` §8).
 
 ### Turno
 
@@ -34,8 +39,10 @@ Cita de mantenimiento agendada por un policía para su vehículo asignado.
 | fechaCreacion | fecha/hora | asignada al confirmar el turno |
 
 **Invariantes**:
-- No pueden existir dos `Turno` con el mismo `franjaId` (FR-005): la
-  reserva de la franja y la creación del turno ocurren de forma atómica.
+- No pueden existir dos `Turno` con el mismo `franjaId` (FR-005): además
+  del `UPDATE` condicional de `FranjaMantenimiento`, la columna
+  `franja_id` de `turno` lleva una restricción `UNIQUE` como segunda
+  barrera de integridad (ver `research.md` §8).
 - Un vehículo con un `Turno` en estado `AGENDADO` se considera "con turno
   vigente" (FR-009, Edge Case) y debe advertirse antes de permitir uno
   nuevo para el mismo vehículo.
@@ -88,3 +95,20 @@ pero el trigger de finalización no se implementa en este US).
 **FranjaMantenimiento**: `DISPONIBLE → OCUPADA` (disparado exclusivamente
 por la confirmación exitosa de un `Turno`, de forma atómica con su
 creación, para satisfacer FR-005).
+
+## Esquema y datos precargados
+
+El DDL de las cuatro tablas (`franja_mantenimiento`, `turno`,
+`vehiculo_asignado`, `notificacion`) se versiona explícitamente en
+`src/main/resources/db/schema.sql` (ver `plan.md` § Project Structure y
+`research.md` §5), en vez de dejarlo a la generación automática de
+Hibernate. `src/main/resources/db/data.sql` precarga:
+
+- Un `vehiculo_asignado` de ejemplo (vehículo + policía) para poder ejecutar
+  `quickstart.md` sin pasos manuales previos.
+- Varias `franja_mantenimiento` en estado `DISPONIBLE` con fechas futuras,
+  suficientes para validar tanto el Escenario 1 (agendar en franja libre)
+  como el Escenario 2 (conflicto + próximas franjas alternativas).
+
+Ambos scripts se ejecutan automáticamente al arrancar la aplicación
+(`spring.sql.init.mode=always`).

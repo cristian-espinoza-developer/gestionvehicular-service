@@ -24,6 +24,16 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: X-Policia-Id
+          in: header
+          required: true
+          description: >
+            Identificador del policía solicitante (FR-010). Mecanismo mínimo
+            de identidad mientras no exista un módulo de autenticación
+            completo (ver research.md §7).
+          schema:
+            type: string
+            format: uuid
       responses:
         '200':
           description: Franjas disponibles encontradas (puede ser una lista vacía)
@@ -31,8 +41,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FranjasDisponiblesResponse'
+        '403':
+          description: El vehículo indicado no está asignado al policía identificado por X-Policia-Id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: Vehículo no encontrado o sin asignación vigente para el policía autenticado
+          description: Vehículo no encontrado
           content:
             application/json:
               schema:
@@ -43,6 +59,17 @@ paths:
       operationId: agendarTurno
       tags: [turnos]
       summary: Confirmar un turno de mantenimiento sobre una franja disponible
+      parameters:
+        - name: X-Policia-Id
+          in: header
+          required: true
+          description: >
+            Identificador del policía solicitante (FR-010). Mecanismo mínimo
+            de identidad mientras no exista un módulo de autenticación
+            completo (ver research.md §7).
+          schema:
+            type: string
+            format: uuid
       requestBody:
         required: true
         content:
@@ -56,8 +83,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TurnoResponse'
+        '403':
+          description: El vehículo indicado no está asignado al policía identificado por X-Policia-Id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: Vehículo sin asignación vigente para el policía autenticado
+          description: Vehículo o franja no encontrados
           content:
             application/json:
               schema:
