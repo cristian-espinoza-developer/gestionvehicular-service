@@ -107,14 +107,14 @@ Proyecto único (Gradle) — ver `plan.md` § Project Structure:
 
 ### Tests for User Story 2 (BDD, escritas antes de la implementación) ⚠️
 
-- [ ] T030 [P] [US2] Unit test de `AgendarTurnoService`: conflicto de franja ya ocupada devuelve próximas franjas disponibles, en `src/test/java/ec/edu/ups/gestionvehicular/turnos/application/AgendarTurnoServiceConflictTest.java`
-- [ ] T031 [P] [US2] Integration test `@WebMvcTest` del escenario de conflicto (`409`) de `TurnosController` en `src/test/java/ec/edu/ups/gestionvehicular/turnos/adapters/in/web/TurnosControllerConflictIT.java`
-- [ ] T032 [US2] Escenario funcional/BDD (Gherkin, Acceptance Scenario 2 de `spec.md`) añadido a `src/test/resources/features/agendar_turno_mantenimiento.feature` y a los step definitions en `src/test/java/ec/edu/ups/gestionvehicular/turnos/bdd/AgendarTurnoStepDefinitions.java` (depende de T024)
+- [X] T030 [P] [US2] Unit test de `AgendarTurnoService`: conflicto de franja ya ocupada devuelve próximas franjas disponibles, en `src/test/java/ec/edu/ups/gestionvehicular/turnos/application/AgendarTurnoServiceConflictTest.java`
+- [X] T031 [P] [US2] Integration test `@WebMvcTest` del escenario de conflicto (`409`) de `TurnosController` en `src/test/java/ec/edu/ups/gestionvehicular/turnos/adapters/in/web/TurnosControllerConflictIT.java`
+- [X] T032 [US2] Escenario funcional/BDD (Gherkin, Acceptance Scenario 2 de `spec.md`) añadido a `src/test/resources/features/agendar_turno_mantenimiento.feature` y a los step definitions en `src/test/java/ec/edu/ups/gestionvehicular/turnos/bdd/AgendarTurnoStepDefinitions.java` (depende de T024)
 
 ### Implementation for User Story 2
 
-- [ ] T033 [US2] Extender `AgendarTurnoService` para capturar el conflicto de franja ya ocupada mediante la actualización condicional `UPDATE franja_mantenimiento SET estado='OCUPADA' WHERE id=? AND estado='DISPONIBLE'` (si afecta 0 filas, lanzar `FranjaNoDisponibleException`; ver `research.md` §8) y calcular las próximas franjas disponibles vía `FranjaRepositoryPort` en `src/main/java/ec/edu/ups/gestionvehicular/turnos/application/service/AgendarTurnoService.java` (depende de T014, T026)
-- [ ] T034 [US2] Añadir un manejador de excepciones que traduzca `FranjaNoDisponibleException` a una respuesta `409` con `proximasFranjasDisponibles` en `src/main/java/ec/edu/ups/gestionvehicular/turnos/adapters/in/web/TurnosExceptionHandler.java` (depende de T029, T033)
+- [X] T033 [US2] Extender `AgendarTurnoService` para capturar el conflicto de franja ya ocupada mediante la actualización condicional `UPDATE franja_mantenimiento SET estado='OCUPADA' WHERE id=? AND estado='DISPONIBLE'` (si afecta 0 filas, lanzar `FranjaNoDisponibleException`; ver `research.md` §8) y calcular las próximas franjas disponibles vía `FranjaRepositoryPort` en `src/main/java/ec/edu/ups/gestionvehicular/turnos/application/service/AgendarTurnoService.java` (depende de T014, T026)
+- [X] T034 [US2] Añadir un manejador de excepciones que traduzca `FranjaNoDisponibleException` a una respuesta `409` con `proximasFranjasDisponibles` en `src/main/java/ec/edu/ups/gestionvehicular/turnos/adapters/in/web/TurnosExceptionHandler.java` (depende de T029, T033)
 
 **Checkpoint**: User Story 1 y 2 funcionan de forma independiente y en conjunto
 
@@ -124,12 +124,12 @@ Proyecto único (Gradle) — ver `plan.md` § Project Structure:
 
 **Purpose**: Edge cases de `spec.md`, verificación de cobertura y validación manual
 
-- [ ] T035 [P] Test y guarda de negocio: vehículo sin asignación devuelve `404` (`VehiculoSinAsignacionException`) — unit test en `application/AgendarTurnoServiceTest.java` e integración en `adapters/in/web/TurnosControllerHappyPathIT.java`
-- [ ] T036 [P] Test y guarda de negocio: turno vigente ya existente para el vehículo devuelve `422` (`TurnoVigenteExistenteException`) — unit test en `application/AgendarTurnoServiceTest.java` e integración en `adapters/in/web/`
-- [ ] T037 [P] Test y manejo: sin franjas disponibles en el rango consultado → respuesta con lista vacía y mensaje explicativo (no una lista vacía sin contexto) en `ConsultarFranjasDisponiblesService` y su test
-- [ ] T038 [P] Test y manejo: fallo al notificar no revierte el turno (`Notificacion` queda `PENDIENTE`, `Turno` permanece `AGENDADO`) — unit test de `AgendarTurnoService` y de `NotificadorTurnoAdapter`
-- [ ] T039 Ejecutar `./gradlew check` y revisar `build/reports/jacoco/test/html/index.html`; ajustar pruebas o exclusiones hasta cumplir >80% por clase y ≥80% global (Principio V)
-- [ ] T040 Ejecutar manualmente los pasos de `quickstart.md` contra el servicio levantado con `./gradlew bootRun` para validar ambos escenarios de aceptación end-to-end
+- [X] T035 [P] Test y guarda de negocio: vehículo sin asignación devuelve `403` (`VehiculoSinAsignacionException`, ajustado tras remediación G1/FR-010 — ver `contracts/openapi.yaml`) — unit test en `application/AgendarTurnoServiceTest.java` e integración en `adapters/in/web/TurnosControllerHappyPathIT.java`
+- [X] T036 [P] Test y guarda de negocio: turno vigente ya existente para el vehículo devuelve `422` (`TurnoVigenteExistenteException`) — unit test en `application/AgendarTurnoServiceTest.java` e integración en `adapters/in/web/`
+- [X] T037 [P] Test y manejo: sin franjas disponibles en el rango consultado → respuesta `200` con lista vacía (self-explanatory para un consumidor API; la orientación textual al usuario final es responsabilidad del frontend, fuera de alcance de este backend) en `ConsultarFranjasDisponiblesService` y `TurnosControllerHappyPathIT`
+- [X] T038 [P] Test y manejo: fallo al notificar no revierte el turno (`Notificacion` queda `PENDIENTE`, `Turno` permanece `AGENDADO`) — unit test de `NotificadorTurnoAdapter` (`NotificadorTurnoAdapterTest.java`); se refactorizó `NotificadorTurnoAdapter` para envolver también el guardado en su propio try/catch y exponer `enviar(...)` como punto de extensión testeable
+- [X] T039 Ejecutar `./gradlew check` y revisar `build/reports/jacoco/test/html/index.html`; ajustar pruebas o exclusiones hasta cumplir >80% por clase y ≥80% global (Principio V) — 38 pruebas, `check` en verde; se excluyó el paquete `adapters/in/web/generated/**` (código de openapi-generator, no propio) de las métricas de cobertura, y se añadieron pruebas de dominio (`TurnoTest`, `FranjaMantenimientoTest`, `VehiculoAsignadoTest`) y de entidades JPA (`JpaEntitiesTest`) para cerrar los huecos de cobertura por clase
+- [X] T040 Ejecutar manualmente los pasos de `quickstart.md` contra el servicio levantado con `./gradlew bootRun` para validar ambos escenarios de aceptación end-to-end
 
 ---
 

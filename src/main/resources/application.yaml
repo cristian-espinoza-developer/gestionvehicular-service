@@ -1,3 +1,12 @@
 spring:
   application:
     name: gestionvehicular-service
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:db/schema.sql
+      data-locations: classpath:db/data.sql
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
